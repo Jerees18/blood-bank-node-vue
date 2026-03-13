@@ -49,7 +49,7 @@
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="submit" class="btn btn-danger" :disabled="loading">
               <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-              ✉️ Send Email
+              📩 Send Request
             </button>
           </div>
         </form>
@@ -160,7 +160,18 @@ const sendRequest = async () => {
     });
     
     if (response.ok) {
-      alert(`Request sent successfully to ${targetName.value}!`);
+      // Only open WhatsApp for single-recipient requests (not bulk)
+      if (props.targetEntities.length === 1 && props.targetEntities[0].phone) {
+        const whatsappMessage = `🩸 *Urgent Blood Requirement!*%0A%0A*${nameLabel}:* ${form.value.patientName}%0A*Blood Group Needed:* ${form.value.bloodGroup}%0A*City:* ${form.value.city}%0A*${locationLabel}:* ${form.value.hospitalLocation}%0A*Contact:* ${form.value.contactNumber}%0A%0APlease contact us immediately if you can assist.`;
+        let phone = props.targetEntities[0].phone.replace(/[\s-]/g, '');
+        if (!phone.startsWith('+')) {
+          phone = '91' + phone; // Add India country code
+        }
+        window.open(`https://wa.me/${phone}?text=${whatsappMessage}`, '_blank');
+        alert(`Request sent to ${targetName.value}! Email sent & WhatsApp opened.`);
+      } else {
+        alert(`Request sent successfully to ${targetName.value} via Email!`);
+      }
       emit('request-sent');
       // Hide modal
       const modalElement = document.getElementById('requestBloodModal');

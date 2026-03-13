@@ -85,6 +85,17 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
   const userType = localStorage.getItem("userType");
 
+  // If already logged in, redirect away from login/register pages
+  const publicPages = ["/login", "/user-register", "/blood-bank-login", "/blood-bank-register", "/forgot-password"];
+  if (isAuthenticated && publicPages.includes(to.path)) {
+    if (userType === "blood_bank") {
+      next("/blood-bank/dashboard");
+    } else {
+      next("/home");
+    }
+    return;
+  }
+
   if (to.meta.requiresAuth && !isAuthenticated) {
     if (to.meta.requiresBank) {
       next("/blood-bank-login");
