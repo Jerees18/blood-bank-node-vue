@@ -5,7 +5,7 @@ node_modules/
 .env
 
 # Database file
-API/database/*.db
+
 
 # IDE
 .vscode/
